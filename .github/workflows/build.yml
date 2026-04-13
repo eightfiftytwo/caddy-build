@@ -1,0 +1,30 @@
+name: build-caddy
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+    paths-ignore: # don't rebuild on documentation change
+      - '**.md'
+  schedule:
+    - cron: '0 0 * * TUE
+
+jobs:
+  build_container:
+    runs-on: ubuntu-latest
+    name: Build container
+    steps:
+      - uses: actions/checkout@v4
+      
+      # https://github.com/marketplace/actions/push-to-ghcr
+      - name: Build and publish a Docker image for ${{ github.repository }}
+        uses: macbre/push-to-ghcr@master
+        with:
+          image_name: ${{ github.repository }}  # it will be lowercased internally
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          dockerfile: ./Containerfile
+          image_tag: 2
+          
